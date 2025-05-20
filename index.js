@@ -70,6 +70,20 @@ async function run() {
       }
     });
 
+    app.delete("/tasks/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const result = await tasksCollection.deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount === 1) {
+          res.json({ success: true, message: "Task deleted successfully" });
+        } else {
+          res.status(404).json({ success: false, message: "Task not found" });
+        }
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to delete task" });
+      }
+    });
+
   } finally {
     // await client.close();
   }
