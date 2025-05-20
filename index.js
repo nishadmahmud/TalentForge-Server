@@ -25,16 +25,6 @@ const tasksCollection = database.collection("tasks");
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-
-    // API Endpoints
     app.post("/tasks", async (req, res) => {
       try {
         const taskData = req.body;
@@ -67,8 +57,20 @@ async function run() {
       }
     });
 
+    app.get("/my-tasks", async (req, res) => {
+      try {
+        const userEmail = req.query.email;
+        if (!userEmail) {
+          return res.status(400).json({ success: false, message: "Email query parameter is required" });
+        }
+        const tasks = await tasksCollection.find({ userEmail }).toArray();
+        res.json({ success: true, tasks });
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to fetch user's tasks" });
+      }
+    });
+
   } finally {
-    // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
