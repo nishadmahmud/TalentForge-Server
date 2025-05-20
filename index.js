@@ -58,6 +58,15 @@ async function run() {
       }
     });
 
+    app.get("/tasks", async (req, res) => {
+      try {
+        const tasks = await tasksCollection.find().toArray();
+        res.json(tasks);
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to fetch tasks" });
+      }
+    });
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
