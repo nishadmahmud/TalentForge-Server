@@ -19,6 +19,10 @@ const client = new MongoClient(uri, {
   },
 });
 
+// Database and collection references
+const database = client.db("freelanceMarketplace");
+const tasksCollection = database.collection("tasks");
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -29,6 +33,31 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+
+    // API Endpoints
+    app.post("/tasks", async (req, res) => {
+      try {
+        const taskData = req.body;
+        const result = await tasksCollection.insertOne({
+          ...taskData,
+          createdAt: new Date(),
+          status: "open"
+        });
+        
+        res.status(201).json({
+          success: true,
+          message: "Task created successfully",
+          taskId: result.insertedId
+        });
+      } catch (error) {
+        console.error("Error creating task:", error);
+        res.status(500).json({
+          success: false,
+          message: "Failed to create task"
+        });
+      }
+    });
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
