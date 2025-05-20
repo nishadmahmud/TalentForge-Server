@@ -84,6 +84,24 @@ async function run() {
       }
     });
 
+    app.patch("/tasks/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updateData = req.body;
+        const result = await tasksCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updateData }
+        );
+        if (result.matchedCount === 1) {
+          res.json({ success: true, message: "Task updated successfully" });
+        } else {
+          res.status(404).json({ success: false, message: "Task not found" });
+        }
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to update task" });
+      }
+    });
+
   } finally {
     // await client.close();
   }
