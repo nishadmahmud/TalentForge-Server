@@ -117,6 +117,27 @@ async function run() {
       }
     });
 
+    app.patch("/tasks/:id/bid", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const bid = req.body;
+        const result = await tasksCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $push: { bids: bid },
+            $inc: { bidCount: 1 }
+          }
+        );
+        if (result.matchedCount === 1) {
+          res.json({ success: true, message: "Bid placed successfully" });
+        } else {
+          res.status(404).json({ success: false, message: "Task not found" });
+        }
+      } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to place bid" });
+      }
+    });
+
   } finally {
     // await client.close();
   }
