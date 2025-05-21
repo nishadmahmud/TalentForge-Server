@@ -103,6 +103,20 @@ async function run() {
       }
     });
 
+    app.get("/tasks/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const task = await tasksCollection.findOne({ _id: new ObjectId(id) });
+        if (task) {
+          res.json(task);
+        } else {
+          res.status(404).json({ message: "Task not found" });
+        }
+      } catch (error) {
+        res.status(500).json({ message: "Failed to fetch task" });
+      }
+    });
+
   } finally {
     // await client.close();
   }
