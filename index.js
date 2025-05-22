@@ -32,19 +32,19 @@ async function run() {
           ...taskData,
           createdAt: new Date(),
           status: "open",
-          bidCount: 0
+          bidCount: 0,
         });
-        
+
         res.status(201).json({
           success: true,
           message: "Task created successfully",
-          taskId: result.insertedId
+          taskId: result.insertedId,
         });
       } catch (error) {
         console.error("Error creating task:", error);
         res.status(500).json({
           success: false,
-          message: "Failed to create task"
+          message: "Failed to create task",
         });
       }
     });
@@ -54,7 +54,9 @@ async function run() {
         const tasks = await tasksCollection.find().toArray();
         res.json({ success: true, tasks });
       } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to fetch tasks" });
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to fetch tasks" });
       }
     });
 
@@ -62,26 +64,37 @@ async function run() {
       try {
         const userEmail = req.query.email;
         if (!userEmail) {
-          return res.status(400).json({ success: false, message: "Email query parameter is required" });
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message: "Email query parameter is required",
+            });
         }
         const tasks = await tasksCollection.find({ userEmail }).toArray();
         res.json({ success: true, tasks });
       } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to fetch user's tasks" });
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to fetch user's tasks" });
       }
     });
 
     app.delete("/tasks/:id", async (req, res) => {
       try {
         const id = req.params.id;
-        const result = await tasksCollection.deleteOne({ _id: new ObjectId(id) });
+        const result = await tasksCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
         if (result.deletedCount === 1) {
           res.json({ success: true, message: "Task deleted successfully" });
         } else {
           res.status(404).json({ success: false, message: "Task not found" });
         }
       } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to delete task" });
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to delete task" });
       }
     });
 
@@ -99,7 +112,9 @@ async function run() {
           res.status(404).json({ success: false, message: "Task not found" });
         }
       } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to update task" });
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to update task" });
       }
     });
 
@@ -125,7 +140,7 @@ async function run() {
           { _id: new ObjectId(id) },
           {
             $push: { bids: bid },
-            $inc: { bidCount: 1 }
+            $inc: { bidCount: 1 },
           }
         );
         if (result.matchedCount === 1) {
@@ -134,10 +149,11 @@ async function run() {
           res.status(404).json({ success: false, message: "Task not found" });
         }
       } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to place bid" });
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to place bid" });
       }
     });
-
   } finally {
     // await client.close();
   }
